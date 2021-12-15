@@ -1,4 +1,5 @@
 const imageDivTitleSelector = 'a.Link--primary';
+const richDiffSelector = 'button[aria-label="Display the rich diff"]';
 
 function getAllImageDivs() {
   const imageDivs = [];
@@ -19,7 +20,7 @@ function getAllImageDivs() {
 
 function clickDiff(imageDiv) {
   try {
-    const diffButton = imageDiv.querySelectorAll('button')[2];
+    const diffButton = imageDiv.querySelector(richDiffSelector);
     diffButton.click();
   } catch (error) {
     console.log(error);
