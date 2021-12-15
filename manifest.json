@@ -4,7 +4,10 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": ["tabs"],
-  "host_permissions": ["*://*.github.com/*"],
+  "host_permissions": [
+    "*://*.github.com/*",
+    "*://viewscreen.githubusercontent.com/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "presistant": false
@@ -12,7 +15,12 @@
   "content_scripts": [
     {
       "matches": ["*://*.github.com/*"],
-      "js": ["main.js"]
+      "js": ["clickDiff.js"]
+    },
+    {
+      "matches": ["*://viewscreen.githubusercontent.com/*"],
+      "js": ["injectDiff.js"],
+      "all_frames": true
     }
   ]
 }
