@@ -4,10 +4,14 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": ["tabs"],
-  "host_permissions": ["*://*.github.com/*/*/pull/*/files"],
+  "host_permissions": ["*://*.github.com/*"],
+  "background": {
+    "service_worker": "background.js",
+    "presistant": false
+  },
   "content_scripts": [
     {
-      "matches": ["*://*.github.com/*/*/pull/*/files"],
+      "matches": ["*://*.github.com/*"],
       "js": ["main.js"]
     }
   ]
