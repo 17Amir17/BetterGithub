@@ -2,111 +2,120 @@
 
 try {
   const viewModesSelector = '.js-view-modes';
-const dataViewElemSelector = 'div[data-type="diff"]';
-const dataViewElem = document.querySelector(dataViewElemSelector);
-const defaultDisplayStyle = dataViewElem.querySelector('.swipe').style;
-const viewMode = document.querySelector(viewModesSelector);
-let diffViewElem;
-let diffLiElem;
+  const dataViewElemSelector = 'div[data-type="diff"]';
+  const dataViewElem = document.querySelector(dataViewElemSelector);
+  const defaultDisplayStyle = dataViewElem.querySelector('.swipe').style;
+  const viewMode = document.querySelector(viewModesSelector);
+  let diffViewElem;
+  let diffLiElem;
 
-function createDiffHtml() {
-  const elem = document.createElement('li');
-  elem.setAttribute('data-mode', 'difference');
-  elem.setAttribute('class', 'js-view-mode-item');
-  elem.addEventListener('click', onDiffClick);
-  elem.innerText = 'Difference';
-  return elem;
-}
+  function createDiffHtml() {
+    const elem = document.createElement('li');
+    elem.setAttribute('data-mode', 'difference');
+    elem.setAttribute('class', 'js-view-mode-item');
+    elem.addEventListener('click', onDiffClick);
+    elem.innerText = 'Difference';
+    return elem;
+  }
 
-function getImages(){
-  const image1 = dataViewElem.querySelectorAll('img')[0]
-  const image2 = dataViewElem.querySelectorAll('img')[1]
-  image1.setAttribute('crossOrigin', '')
-  image2.setAttribute('crossOrigin', '')
-  return {image1, image2};
-}
+  function getImages() {
+    const image1 = dataViewElem.querySelectorAll('img')[0].cloneNode();
+    const image2 = dataViewElem.querySelectorAll('img')[1].cloneNode();
+    image1.setAttribute('crossOrigin', '');
+    image2.setAttribute('crossOrigin', '');
+    image1.style = '';
+    image2.style = '';
+    console.log(image1, image2);
+    return { image1, image2 };
+  }
 
-function resizeTo(canvas,pct){
-  const tempCanvas = document.createElement("canvas");
-  const tctx = tempCanvas.getContext("2d");
-  const cw = canvas.width;
-  const ch = canvas.height;
-  tempCanvas.width=cw;
-  tempCanvas.height=ch;
-  tctx.drawImage(canvas,0,0);
-  canvas.width *= pct;
-  canvas.height *= pct;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*pct,ch*pct);
-}
+  function resizeTo(canvas, pct) {
+    const tempCanvas = document.createElement('canvas');
+    const tctx = tempCanvas.getContext('2d');
+    const cw = canvas.width;
+    const ch = canvas.height;
+    tempCanvas.width = cw;
+    tempCanvas.height = ch;
+    tctx.drawImage(canvas, 0, 0);
+    canvas.width *= pct;
+    canvas.height *= pct;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(tempCanvas, 0, 0, cw, ch, 0, 0, cw * pct, ch * pct);
+  }
 
-function createDiffView(image1, image2) {
-  image1 = image1.cloneNode();
-  image2 = image2.cloneNode();
-  image1.style = "";
-  image2.style = "";
-  console.log(image1, image2);
-  const elem = dataViewElem.querySelector('.swipe').cloneNode();
-  elem.setAttribute('class', 'difference view');
-  // Image diff
-  const diff = imagediff.diff(image1, image2);
-  const canvas = imagediff.createCanvas(diff.width, diff.height);
-  const context = canvas.getContext('2d');
-  // Draw the generated image with differences on the canvas
-  context.putImageData(diff, 0, 0);
-  // Now you can do whatever you want with the canvas
-  // for example render it inside a div element:
-  console.log(defaultDisplayStyle.width.split('px')[0]);
-  const resizeBy = Number(defaultDisplayStyle.width.split('px')[0]) / diff.width / 2;
-  console.log(resizeBy);
-  resizeTo(canvas, resizeBy);
-  elem.appendChild(canvas);
-  return elem;
-}
+  function createDiffView(image1, image2) {
+    console.log(image1.width);
+    const elem = dataViewElem.querySelector('.swipe').cloneNode();
+    elem.setAttribute('class', 'difference view');
+    // Image diff
+    const diff = imagediff.diff(image1, image2);
+    const canvas = imagediff.createCanvas(diff.width, diff.height);
+    const context = canvas.getContext('2d');
+    // Draw the generated image with differences on the canvas
+    context.putImageData(diff, 0, 0);
+    // Now you can do whatever you want with the canvas
+    // for example render it inside a div element:
+    const resizeBy =
+      Number(defaultDisplayStyle.width.split('px')[0]) / diff.width;
+    console.log(resizeBy);
+    resizeTo(canvas, resizeBy);
+    elem.appendChild(canvas);
+    return elem;
+  }
 
-function deactivate(elements) {
-  elements.forEach((sibling) => {
-    sibling.classList.remove('active');
-  });
-}
+  function deactivate(elements) {
+    elements.forEach((sibling) => {
+      sibling.classList.remove('active');
+    });
+  }
 
-function hideAll(elements) {
-  elements.forEach((elem) => (elem.style.display = 'none'));
-}
+  function hideAll(elements) {
+    elements.forEach((elem) => (elem.style.display = 'none'));
+  }
 
-function onDiffClick(e) {
-  // Deactivate all other ticks
-  deactivate([...viewMode.querySelectorAll('li')]);
-  e.target.classList.add('active');
-  // Hide all views
-  hideAll([...document.querySelectorAll('.view')]);
-  //Show diff view
-  diffViewElem.style = defaultDisplayStyle;
-}
+  function onDiffClick(e) {
+    // Deactivate all other ticks
+    deactivate([...viewMode.querySelectorAll('li')]);
+    e.target.classList.add('active');
+    // Hide all views
+    hideAll([...document.querySelectorAll('.view')]);
+    //Show diff view
+    diffViewElem.style = defaultDisplayStyle;
+  }
 
-let iCount = 0;
-function onImageLoad(){
-  iCount++;
-  if(iCount != 2) return;
-  const {image1, image2 } = getImages();
-  diffViewElem = createDiffView(image1, image2);
-  dataViewElem.appendChild(diffViewElem);
-  console.log("Done!");
-}
+  function waitForImageData(){
+    return new Promise((res) => {
+      setTimeout( () => {
+        const { image1, image2 } = getImages();
+        if(image1.src && image1.src != '' && image2.src && image2.src != ''){
+          res();
+        }
+      } , 100)
+    })  
+  }
 
-function injectDifference() {
-  diffLiElem = createDiffHtml();
-  viewMode.appendChild(diffLiElem);
-  setTimeout(()=>{
-    //This is a very bad way of doing things i know i am lazy  
+  (async () => {
+    await waitForImageData();
     const { image1, image2 } = getImages();
-    image1.onload = onImageLoad;
-    image2.onload = onImageLoad;
-  }, 500);
-}
 
+    let iCount = 0;
+    function onImageLoad() {
+      iCount++;
+      if (iCount != 2) return;
+      console.log(image1.width);
+      diffViewElem = createDiffView(image1, image2);
+      dataViewElem.appendChild(diffViewElem);
+      console.log('Done!');
+    }
 
-injectDifference();
-} catch (error) {
-  
-}
+    function injectDifference() {
+      diffLiElem = createDiffHtml();
+      viewMode.appendChild(diffLiElem);
+      //This is a very bad way of doing things i know i am lazy
+      image1.onload = onImageLoad;
+      image2.onload = onImageLoad;
+    }
+
+    injectDifference();
+  })();
+} catch (error) {}
