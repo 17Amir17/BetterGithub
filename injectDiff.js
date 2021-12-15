@@ -4,6 +4,7 @@ const dataViewElemSelector = 'div[data-type="diff"]';
 const dataViewElem = document.querySelector(dataViewElemSelector);
 const diffViewElem = createDiffView();
 const diffLiElem = createDiffHtml();
+const defaultDisplayStyle = dataViewElem.querySelector('.swipe').style;
 const viewMode = document.querySelector(viewModesSelector);
 
 function createDiffHtml() {
@@ -39,7 +40,7 @@ function onDiffClick(e) {
   // Hide all views
   hideAll([...document.querySelectorAll('.view')]);
   //Show diff view
-  diffViewElem.hidden = false;
+  diffViewElem.style = defaultDisplayStyle;
 }
 
 function injectDifference() {
