@@ -3,10 +3,10 @@ const imageDivTitleSelector = 'a.Link--primary';
 const viewModesSelector = '.js-view-modes';
 const dataViewElemSelector = 'div[data-type="diff"]';
 const dataViewElem = document.querySelector(dataViewElemSelector);
-const diffViewElem = createDiffView();
-const diffLiElem = createDiffHtml();
 const defaultDisplayStyle = dataViewElem.querySelector('.swipe').style;
 const viewMode = document.querySelector(viewModesSelector);
+let diffViewElem;
+let diffLiElem;
 
 function createDiffHtml() {
   const elem = document.createElement('li');
@@ -17,13 +17,19 @@ function createDiffHtml() {
   return elem;
 }
 
-function createDiffView() {
-  const image1 = dataViewElem.dataset.file1;
-  const image2 = dataViewElem.dataset.file2;
+function getImages(){
+  const image1 = dataViewElem.querySelectorAll('img')[0]
+  const image2 = dataViewElem.querySelectorAll('img')[1]
+  image1.setAttribute('crossOrigin', '')
+  image2.setAttribute('crossOrigin', '')
+  return {image1, image2};
+}
+
+function createDiffView(image1, image2) {
+  console.log(image1, image2);
   const elem = dataViewElem.querySelector('.swipe').cloneNode();
   elem.setAttribute('class', 'difference view');
   // Image diff
-  console.log(image1);
   const diff = imagediff.diff(image1, image2);
   const canvas = imagediff.createCanvas(diff.width, diff.height);
   const context = canvas.getContext('2d');
@@ -55,10 +61,25 @@ function onDiffClick(e) {
   diffViewElem.style = defaultDisplayStyle;
 }
 
-function injectDifference() {
-  viewMode.appendChild(diffLiElem);
-  //   console.log(createDiffView());
+let iCount = 0;
+function onImageLoad(){
+  iCount++;
+  if(iCount != 2) return;
+  const {image1, image2 } = getImages();
+  diffViewElem = createDiffView(image1, image2);
   dataViewElem.appendChild(diffViewElem);
+  console.log("Done!");
+}
+
+function injectDifference() {
+  diffLiElem = createDiffHtml();
+  viewMode.appendChild(diffLiElem);
+  setTimeout(()=>{
+    //This is a very bad way of doing things i know i am lazy  
+    const {image1, image2 } = getImages();
+    image1.onload = onImageLoad;
+    image2.onload = onImageLoad;
+  }, 100)
 }
 
 console.log('Running');
