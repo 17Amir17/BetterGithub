@@ -4,7 +4,6 @@ function getAllImageDivs() {
   const imageDivs = [];
   const imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
   const imageTitleDivs = [...document.querySelectorAll(imageDivTitleSelector)];
-  console.log(imageTitleDivs);
   imageTitleDivs.map((elem) => {
     const elemTitle = elem.getAttribute('title');
     if (typeof elemTitle === 'string' && imageReg.test(elemTitle)) {
@@ -28,6 +27,11 @@ function clickDiff(imageDiv) {
 }
 
 function clickAllDiff() {
+  // Wait a second for all dom to load
+  // This is a pretty bad way to do this
+  // However I cant simply use a onLoad event listener
+  // Because the event isn't called probably because it is
+  // loaded in a similar way to react-router-dom (the page does not refresh)
   setTimeout(() => {
     const imageDivs = getAllImageDivs();
     imageDivs.forEach(clickDiff);
@@ -39,9 +43,7 @@ clickAllDiff();
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // listen for messages sent from background.js
   if (request.message === 'TAB_CHANGED') {
-    console.log(request.url.includes('files'));
     if (request.url && request.url.endsWith('files')) {
-      console.log('Clicking!');
       clickAllDiff();
     }
   }
