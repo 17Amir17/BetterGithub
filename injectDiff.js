@@ -25,7 +25,25 @@ function getImages(){
   return {image1, image2};
 }
 
+function resizeTo(canvas,pct){
+  const tempCanvas = document.createElement("canvas");
+  const tctx = tempCanvas.getContext("2d");
+  const cw = canvas.width;
+  const ch = canvas.height;
+  tempCanvas.width=cw;
+  tempCanvas.height=ch;
+  tctx.drawImage(canvas,0,0);
+  canvas.width *= pct;
+  canvas.height *= pct;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(tempCanvas,0,0,cw,ch,0,0,cw*pct,ch*pct);
+}
+
 function createDiffView(image1, image2) {
+  image1 = image1.cloneNode();
+  image2 = image2.cloneNode();
+  image1.style = "";
+  image2.style = "";
   console.log(image1, image2);
   const elem = dataViewElem.querySelector('.swipe').cloneNode();
   elem.setAttribute('class', 'difference view');
@@ -37,6 +55,10 @@ function createDiffView(image1, image2) {
   context.putImageData(diff, 0, 0);
   // Now you can do whatever you want with the canvas
   // for example render it inside a div element:
+  console.log(defaultDisplayStyle.width.split('px')[0]);
+  const resizeBy = Number(defaultDisplayStyle.width.split('px')[0]) / diff.width / 2;
+  console.log(resizeBy);
+  resizeTo(canvas, resizeBy);
   elem.appendChild(canvas);
   return elem;
 }
@@ -76,10 +98,10 @@ function injectDifference() {
   viewMode.appendChild(diffLiElem);
   setTimeout(()=>{
     //This is a very bad way of doing things i know i am lazy  
-    const {image1, image2 } = getImages();
+    const { image1, image2 } = getImages();
     image1.onload = onImageLoad;
     image2.onload = onImageLoad;
-  }, 100)
+  }, 100);
 }
 
 console.log('Running');
