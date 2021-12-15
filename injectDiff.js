@@ -102,7 +102,7 @@ function injectDifference() {
     const { image1, image2 } = getImages();
     image1.onload = onImageLoad;
     image2.onload = onImageLoad;
-  }, 100);
+  }, 500);
 }
 
 
