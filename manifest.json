@@ -1,0 +1,14 @@
+{
+  "name": "Better Github",
+  "description": "A better version of github",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["tabs"],
+  "host_permissions": ["*://*.github.com/*/*/pull/*/files"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.github.com/*/*/pull/*/files"],
+      "js": ["./scripts/main.js", "./scripts/utils/utils.js"]
+    }
+  ]
+}
