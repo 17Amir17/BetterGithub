@@ -128,10 +128,9 @@ try {
       image1.onload = onImageLoad;
       image2.onload = onImageLoad;
     }
-
     injectDifference();
   })();
 } catch (error) {
-  console.log("Inject Diff Error");
-  console.error(error);
+  //console.log("Inject Diff Error");
+  //console.error(error);
 }
