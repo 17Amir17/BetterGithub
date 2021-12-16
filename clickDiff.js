@@ -3,10 +3,12 @@ const richDiffSelector = 'button[aria-label="Display the rich diff"]';
 const imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
 
 async function getAllImageDivs() {
+  // Get all divs with image in title
   const imageDivs = [];
   const imageTitleDivs = await selectImageDivTitle();
   imageTitleDivs.map((elem) => {
     const elemTitle = elem.getAttribute('title');
+    // Validate title
     if (typeof elemTitle === 'string' && imageReg.test(elemTitle)) {
       try {
         imageDivs.push(elem.parentElement.parentElement);
@@ -19,6 +21,7 @@ async function getAllImageDivs() {
 }
 
 const select = () => {
+  // Select all image titles after 100ms
   return new Promise((res) => {
     setTimeout(() => {
       //Select all title dive
@@ -34,7 +37,10 @@ const select = () => {
   });
 };
 
+
 async function selectImageDivTitle() {
+  // Github loades the images after the page is loaded so I gather them
+  // Between a minimum amount of tries and a maximum timeout
   const timeout = 10;
   const minimun = 5;
   let current = 1;
@@ -49,6 +55,7 @@ async function selectImageDivTitle() {
 }
 
 function clickDiff(imageDiv) {
+  //Click the diff button
   try {
     const diffButton = imageDiv.querySelector(richDiffSelector);
     diffButton.click();

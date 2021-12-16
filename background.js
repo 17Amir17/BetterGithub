@@ -1,6 +1,5 @@
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  // read changeInfo data and do something with it
-  // like send the new url to contentscripts.js
+  //Whenever the url changes I send the url to my content scripts
   if (changeInfo.url) {
     chrome.tabs.sendMessage(tabId, {
       message: 'TAB_CHANGED',
