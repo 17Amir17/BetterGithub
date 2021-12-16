@@ -99,7 +99,6 @@ try {
     function onImageLoad() {
       iCount++;
       if (iCount != 2) return;
-      console.log(image1.width);
       diffViewElem = createDiffView(image1, image2);
       dataViewElem.appendChild(diffViewElem);
     }
@@ -114,4 +113,6 @@ try {
 
     injectDifference();
   })();
-} catch (error) {}
+} catch (error) {
+  console.log("Inject Diff Error");
+}

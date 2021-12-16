@@ -39,6 +39,7 @@ function clickAllDiff() {
   }, 1000);
 }
 
+console.log("Running");
 clickAllDiff();
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
