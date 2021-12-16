@@ -25,7 +25,6 @@ try {
     image2.setAttribute('crossOrigin', '');
     image1.style = '';
     image2.style = '';
-    console.log(image1, image2);
     return { image1, image2 };
   }
 
@@ -44,7 +43,6 @@ try {
   }
 
   function createDiffView(image1, image2) {
-    console.log(image1.width);
     const elem = dataViewElem.querySelector('.swipe').cloneNode();
     elem.setAttribute('class', 'difference view');
     // Image diff
@@ -57,7 +55,6 @@ try {
     // for example render it inside a div element:
     const resizeBy =
       Number(defaultDisplayStyle.width.split('px')[0]) / diff.width;
-    console.log(resizeBy);
     resizeTo(canvas, resizeBy);
     elem.appendChild(canvas);
     return elem;
@@ -105,7 +102,6 @@ try {
       console.log(image1.width);
       diffViewElem = createDiffView(image1, image2);
       dataViewElem.appendChild(diffViewElem);
-      console.log('Done!');
     }
 
     function injectDifference() {
