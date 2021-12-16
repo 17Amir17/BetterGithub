@@ -1,12 +1,14 @@
 const imageDivTitleSelector = 'a.Link--primary';
 const richDiffSelector = 'button[aria-label="Display the rich diff"]';
+const imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
 
-function getAllImageDivs() {
+async function getAllImageDivs() {
+  // Get all divs with image in title
   const imageDivs = [];
-  const imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
-  const imageTitleDivs = [...document.querySelectorAll(imageDivTitleSelector)];
+  const imageTitleDivs = await selectImageDivTitle();
   imageTitleDivs.map((elem) => {
     const elemTitle = elem.getAttribute('title');
+    // Validate title
     if (typeof elemTitle === 'string' && imageReg.test(elemTitle)) {
       try {
         imageDivs.push(elem.parentElement.parentElement);
@@ -18,7 +20,42 @@ function getAllImageDivs() {
   return imageDivs;
 }
 
+const select = () => {
+  // Select all image titles after 100ms
+  return new Promise((res) => {
+    setTimeout(() => {
+      //Select all title dive
+      let imageTitleDivs = [
+        ...document.querySelectorAll(imageDivTitleSelector),
+      ];
+      // Filter out non image titles
+      imageTitleDivs = imageTitleDivs.filter((div) =>
+        imageReg.test(div.innerText)
+      );
+      res(imageTitleDivs);
+    }, 100);
+  });
+};
+
+
+async function selectImageDivTitle() {
+  // Github loades the images after the page is loaded so I gather them
+  // Between a minimum amount of tries and a maximum timeout
+  const timeout = 10;
+  const minimun = 5;
+  let current = 1;
+  while (current < timeout || current < minimun) {
+    const imgTitleDiv = await select();
+    if (imgTitleDiv.length !== 0) {
+      if (current > minimun) return imgTitleDiv;
+    }
+    current++;
+  }
+  return [];
+}
+
 function clickDiff(imageDiv) {
+  //Click the diff button
   try {
     const diffButton = imageDiv.querySelector(richDiffSelector);
     diffButton.click();
@@ -27,16 +64,9 @@ function clickDiff(imageDiv) {
   }
 }
 
-function clickAllDiff() {
-  // Wait a second for all dom to load
-  // This is a pretty bad way to do this
-  // However I cant simply use a onLoad event listener
-  // Because the event isn't called probably because it is
-  // loaded in a similar way to react-router-dom (the page does not refresh)
-  setTimeout(() => {
-    const imageDivs = getAllImageDivs();
-    imageDivs.forEach(clickDiff);
-  }, 1000);
+async function clickAllDiff() {
+  const imageDivs = await getAllImageDivs();
+  imageDivs.forEach(clickDiff);
 }
 
 clickAllDiff();
