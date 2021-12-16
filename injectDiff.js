@@ -115,4 +115,5 @@ try {
   })();
 } catch (error) {
   console.log("Inject Diff Error");
+  console.error(error);
 }
