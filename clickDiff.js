@@ -1,6 +1,7 @@
 const imageDivTitleSelector = 'a.Link--primary';
 const richDiffSelector = 'button[aria-label="Display the rich diff"]';
 const imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i;
+const filesChangedSelector = '.tabnav-tab'
 
 async function getAllImageDivs() {
   // Get all divs with image in title
@@ -65,17 +66,57 @@ function clickDiff(imageDiv) {
 }
 
 async function clickAllDiff() {
+  listenForTabChange(1000);
   const imageDivs = await getAllImageDivs();
   imageDivs.forEach(clickDiff);
 }
 
-clickAllDiff();
+function listenForTabChange(delay){
+  setTimeout(() => {
+    const tabs = document.querySelectorAll(filesChangedSelector);
+    if(tabs && tabs.length >= 4){
+      tabs[3].addEventListener('click', () => {
+        clickAllDiff();
+        // listenForTabChange(1000);
+      })
+    }
+  }, delay)
+}
+
+let clicked = 0;
+function listenForInnerTabChange(url){
+  setInterval(() => {
+    if(!onFilesPage(window.location.href)){
+      clicked = 0;
+    }else{
+      if(clicked === 0){
+        clickAllDiff();
+        clicked++;
+      }
+    }
+  }, 1000);
+}
+
+function onFilesPage(url){
+  let lastPath =  url.split('/');
+  lastPath = lastPath[lastPath.length-1].substr(0, 5);
+  return lastPath === 'files';
+}
+
+if(onFilesPage(window.location.href)){
+  listenForInnerTabChange(window.location.href);
+  clickAllDiff();
+  clicked++;
+}
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // listen for messages sent from background.js
-  if (request.message === 'TAB_CHANGED') {
-    if (request.url && request.url.endsWith('files')) {
-      clickAllDiff();
+  if (request.message === 'TAB_CHANGED' && clicked === 0) {
+    if (request.url) {
+      if(onFilesPage(request.url)){
+        clickAllDiff();
+        clicked++;
+      }
     }
   }
 });
