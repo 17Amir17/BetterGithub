@@ -73,12 +73,9 @@ async function clickAllDiff() {
 
 function listenForTabChange(delay){
   setTimeout(() => {
-    console.log("Listen for tab change");
     const tabs = document.querySelectorAll(filesChangedSelector);
     if(tabs && tabs.length >= 4){
-      console.log(tabs[3]);
       tabs[3].addEventListener('click', () => {
-        console.log("Click");
         clickAllDiff();
         // listenForTabChange(1000);
       })
@@ -88,14 +85,11 @@ function listenForTabChange(delay){
 
 let clicked = 0;
 function listenForInnerTabChange(url){
-  console.log("Running check");
   setInterval(() => {
     if(!onFilesPage(window.location.href)){
-      console.log("Not on files");
       clicked = 0;
     }else{
       if(clicked === 0){
-        console.log("On files");
         clickAllDiff();
         clicked++;
       }
@@ -115,14 +109,11 @@ if(onFilesPage(window.location.href)){
   clicked++;
 }
 
-console.log("Adding Listener");
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // listen for messages sent from background.js
   if (request.message === 'TAB_CHANGED' && clicked === 0) {
-    console.log("Tab changed");
     if (request.url) {
       if(onFilesPage(request.url)){
-        console.log("Clicking");
         clickAllDiff();
         clicked++;
       }
