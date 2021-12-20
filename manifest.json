@@ -10,7 +10,7 @@
   ],
   "background": {
     "service_worker": "background.js",
-    "presistant": false
+    "presistant": true
   },
   "content_scripts": [
     {
